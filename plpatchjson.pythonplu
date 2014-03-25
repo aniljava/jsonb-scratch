@@ -1,0 +1,17 @@
+DROP FUNCTION IF EXISTS patchjson(original text, patch text);
+CREATE FUNCTION patchjson(doc text, patch text) RETURNS text AS $$
+if 'json' in SD:
+    json = SD['json']
+    jsonpatch = SD['jsonpatch']
+else:
+    import json
+    import jsonpatch
+    SD['json'] = json
+    SD['jsonpatch'] = jsonpatch
+
+_doc = json.loads(doc)
+_patch = json.loads(patch)
+result = jsonpatch.apply_patch(_doc, _patch)
+return result
+    # rest of function
+$$ LANGUAGE plpythonu;
